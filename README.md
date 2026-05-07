@@ -30,7 +30,7 @@ Shader の種類を選択するとそれが反映されたオブジェクトを�
 
 ### Editor で再生する
 
-Unity Editor を開き、`Assets/Scenes/SampleScene.unity` を開いて Play ボタンを押す。
+Unity Editor を開き、`Assets/Scenes/Main.unity` を開いて Play ボタンを押す。
 
 ### ビルドする
 

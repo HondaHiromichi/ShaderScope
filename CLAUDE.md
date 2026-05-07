@@ -29,7 +29,7 @@ ShaderScope は **Shader Viewer アプリ**。ユーザーがシェーダーの�
   - URP プロファイルは `Assets/Settings/` に Performant / Balanced / HighFidelity の 3 段階が用意されている
 - **アセンブリ構成**: `.asmdef` 未配置 → 全スクリプトが `Assembly-CSharp` (ランタイム) または `Assembly-CSharp-Editor` (Editor) に入る。コード規模が増える前に `.asmdef` 分割を提案すべき
 - **テストフレームワーク**: `com.unity.test-framework` 1.1.33 はインストール済みだがテストアセンブリ未作成
-- **エントリシーン**: `Assets/Scenes/SampleScene.unity` (URP テンプレートのデフォルト)
+- **エントリシーン**: `Assets/Scenes/Main.unity`
 
 ## ビルド・テスト・実行
 
@@ -43,13 +43,15 @@ C# のコンパイルエラー確認は Unity の Console を介する必要が�
 
 ## UnityMCP について
 
-`Packages/manifest.json` に `com.coplaydev.unity-mcp` が含まれていない。Unity Editor の状態確認・コンソールログ取得・コンパイルエラー確認を Claude から行いたい場合、以下を `manifest.json` の `dependencies` に追加するようユーザーに提案すること:
+`com.coplaydev.unity-mcp` が `Packages/manifest.json` に導入済み。Unity Editor 操作は UnityMCP ツール・リソースを優先的に使用する:
 
-```
-"com.coplaydev.unity-mcp": "https://github.com/CoplayDev/unity-mcp.git?path=/MCPForUnity"
-```
+- **Editor 状態確認**: `mcpforunity://editor/state` リソースで Play モード・コンパイル状態・ドメインリロード状況を確認
+- **Console ログ取得**: `read_console` ツールでエラー・警告を取得 (スクリプト変更後は必ずチェック)
+- **シーン操作**: `manage_scene` (CRUD)、`find_gameobjects` (検索)、`manage_gameobject` (個別操作)
+- **アセット操作**: `manage_asset`、`manage_material`、`manage_shader` 等
+- **スクリプト変更フロー**: スクリプトを作成・編集したら `read_console` でコンパイルエラー確認 → エラーがなければ次の操作へ進む
 
-導入後は UnityMCP のツールを積極的に活用する (Editor 状態確認、Console ログ取得、コンパイルエラー検出)。
+複数 Unity インスタンスが起動中の場合は `set_active_instance` でターゲットを固定する (本プロジェクトは `ShaderScope`)。
 
 ## コーディング規約
 
@@ -61,6 +63,13 @@ C# のコンパイルエラー確認は Unity の Console を介する必要が�
 - 1 ファイル 1 MonoBehaviour、ファイル名 = クラス名
 - Inspector 公開は `[SerializeField] private` を使う(`public` フィールドは作らない)
 - `Library/`, `Temp/`, `Logs/`, `UserSettings/`, `*.csproj`, `*.sln`, `.vscode/` はコミット対象外
+
+## Git ワークフロー
+
+グローバル CLAUDE.md に共通の Git ワークフロー (コミットメッセージのプレフィックス、コミット粒度、ユーザー確認フロー等) が定義されているのでそれに従う。本プロジェクト固有の運用は以下:
+
+- **ブランチ運用**: `main` はリリース安定版、`dev` は開発統合用ブランチ。開発中の作業は `feature/*` 等の作業ブランチから `dev` に PR を出す。`main` を直接ベースにしてよいのは `dev` → `main` のリリース統合や hotfix 等、明示的な指示があるときのみ
+- **PR 作成時のデフォルトベース**: `gh pr create` の際は明示的に `--base dev` を指定する (リポジトリ既定ブランチが `main` のため省略すると `main` がベースになるので注意)
 
 ## ファイルの追加・リネーム・削除
 
