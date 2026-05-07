@@ -29,7 +29,7 @@ ShaderScope は **Shader Viewer アプリ**。ユーザーがシェーダーの�
   - URP プロファイルは `Assets/Settings/` に Performant / Balanced / HighFidelity の 3 段階が用意されている
 - **アセンブリ構成**: `.asmdef` 未配置 → 全スクリプトが `Assembly-CSharp` (ランタイム) または `Assembly-CSharp-Editor` (Editor) に入る。コード規模が増える前に `.asmdef` 分割を提案すべき
 - **テストフレームワーク**: `com.unity.test-framework` 1.1.33 はインストール済みだがテストアセンブリ未作成
-- **エントリシーン**: `Assets/Scenes/SampleScene.unity` (URP テンプレートのデフォルト)
+- **エントリシーン**: `Assets/Scenes/Main.unity`
 
 ## ビルド・テスト・実行
 
