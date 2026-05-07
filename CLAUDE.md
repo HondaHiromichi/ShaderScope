@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ShaderScope は **Shader Viewer アプリ**。ユーザーがシェーダーの種類を選択すると、それが適用されたオブジェクトを 3D ビュー上で確認できる。Unity **2022.3.62f3** (LTS) / **URP 14.0.12** ベースで、**Windows と Mac 両プラットフォーム対応**を想定する。
 
-現状は URP テンプレートの初期状態で、独自スクリプトは未追加(`Assets/TutorialInfo/Scripts/Readme.cs` および `ReadmeEditor.cs` は Unity テンプレート由来のチュートリアル表示用で、ゲーム機能ではない)。
+現状は URP テンプレートをベースに **メイン画面の UI scaffolding が構築済み** (`Assets/Scenes/Main.unity` の `MainCanvas` 配下にトップバー / Shader Library / Inspector / モデル strip 等が配置されている)。機能ロジック (ボタンクリック / シェーダー切替 / カメラ操作 等) は未実装で、別ブランチで段階的に実装する想定。`Assets/TutorialInfo/Scripts/Readme.cs` および `ReadmeEditor.cs` は Unity テンプレート由来のチュートリアル表示用で、ゲーム機能ではない。
 
 アーキテクチャは未確立。最初のスクリプト・シェーダーを追加する際は以下のディレクトリ構成をベースとし、必要に応じてユーザーと合意の上で調整すること:
 
@@ -40,6 +40,38 @@ GUI 操作が基本で CLI スクリプトは未整備:
 - **テスト**: Unity Editor の `Window > General > Test Runner` (Edit Mode / Play Mode)。CLI 実行が必要な場合は `Unity.exe -batchmode -runTests -projectPath . -testResults results.xml -testPlatform EditMode` 等を使用
 
 C# のコンパイルエラー確認は Unity の Console を介する必要がある。後述の UnityMCP が利用可能ならそれ経由が最速。
+
+## メイン画面 UI
+
+`Assets/Scenes/Main.unity` の `MainCanvas` 配下に Figma デザインベースのメイン画面 UI が構築されている。シーンが Unity 側の source of truth で、変更は Unity Editor 上で直接編集する。
+
+### デザインソース (Figma)
+
+- **ファイル名**: `ShaderScope - Main Screen Design Proposals`
+- **URL**: https://www.figma.com/design/VSgiCUrbKECmtfgEUQm9Hq?node-id=10-2 (採用フレーム `ShaderScope - Main Screen` への直リンク、node id `10:2`)
+- **配置**: GENEROSITY チーム > Drafts (Pro プラン、認証要)
+- **キャンバスサイズ**: 1920x1080 固定
+- **設計思想**: 「増えうる要素は親パネル自体を ScrollRect 化する」scroll-only 戦略 (シェーダー / モデル / パラメータ等の項目増加に対し、検索フィールド / Pin / +N オーバーフロー等の追加 UI を持ち込まずに ScrollRect 一本で対応する)
+
+UI 見た目の変更は Figma 側を先に更新してから Unity 実装に反映するフローを推奨。Figma の編集が必要な際は claude.ai Figma MCP server を使う。
+
+### 主要コンポーネント
+
+- **TopBar**: ロゴ / Breadcrumb / Save・Export・Settings・Focus ボタン
+- **Left Dock**: 機能カテゴリの縦アイコン列 (縦スクロール対応)
+- **Shader Library**: 検索 / フィルタチップ横スクロール / カードグリッド縦スクロール
+- **Inspector**: シェーダーパラメータの折りたたみグループ (縦スクロール)
+- **Bottom Bar**: モデル横スクロールカルーセル + ビューポートツール
+- **Gizmo / Zoom Badge**: 左下軸表示・右上ズーム情報
+
+### 実装上のポイント
+
+- Canvas は `Screen Space - Camera` (Main Camera 経由レンダリング)、CanvasScaler 参照解像度 1920x1080 / Match 0.5
+- 角丸は `com.nobi.roundedcorners` (kirevdokimov/Unity-UI-Rounded-Corners) の `ImageWithRoundedCorners` で shader-based に適用 (Image + 同コンポーネントを併設)
+- 角丸用ベース sprite として `Assets/UI/White.png` (4x4 白) を全 Image の sprite に共通使用
+- 各 ScrollRect は Container に raycast 受け取り用透明 Image を付与した上で、Unity 標準の `Scrollbar` (Track + Sliding Area + Handle 階層) を配線済み (handle が content / viewport 比に応じて自動サイズ調整)
+- ボタン・チップ・カード等のクリックハンドラは未実装。機能実装フェーズで追加する想定
+- カード・モデルタイル・パラメータ行はダミーデータが scene に直接配置されている。実装フェーズでシェーダー / モデルレジストリからの動的生成に置き換える想定
 
 ## UnityMCP について
 
