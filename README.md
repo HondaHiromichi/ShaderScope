@@ -43,11 +43,12 @@ Unity Editor を開き、`Assets/Scenes/Main.unity` を開いて Play ボタン�
 
 ```
 Assets/
-├── Scenes/         Viewer のメインシーン
+├── Scenes/         Viewer のメインシーン (Main.unity)
 ├── Scripts/        UI / カメラ操作 / シェーダー切替ロジック (C#)
 ├── Shaders/        .shader / ShaderGraph アセット
 ├── Materials/      シェーダーごとのマテリアル
 ├── Models/         プレビュー対象の 3D モデル
+├── UI/             UI 用に自動生成される sprite 等
 └── Settings/       URP プロファイル (Performant / Balanced / HighFidelity)
 ```
 
