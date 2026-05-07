@@ -43,13 +43,15 @@ C# のコンパイルエラー確認は Unity の Console を介する必要が�
 
 ## UnityMCP について
 
-`Packages/manifest.json` に `com.coplaydev.unity-mcp` が含まれていない。Unity Editor の状態確認・コンソールログ取得・コンパイルエラー確認を Claude から行いたい場合、以下を `manifest.json` の `dependencies` に追加するようユーザーに提案すること:
+`com.coplaydev.unity-mcp` が `Packages/manifest.json` に導入済み。Unity Editor 操作は UnityMCP ツール・リソースを優先的に使用する:
 
-```
-"com.coplaydev.unity-mcp": "https://github.com/CoplayDev/unity-mcp.git?path=/MCPForUnity"
-```
+- **Editor 状態確認**: `mcpforunity://editor/state` リソースで Play モード・コンパイル状態・ドメインリロード状況を確認
+- **Console ログ取得**: `read_console` ツールでエラー・警告を取得 (スクリプト変更後は必ずチェック)
+- **シーン操作**: `manage_scene` (CRUD)、`find_gameobjects` (検索)、`manage_gameobject` (個別操作)
+- **アセット操作**: `manage_asset`、`manage_material`、`manage_shader` 等
+- **スクリプト変更フロー**: スクリプトを作成・編集したら `read_console` でコンパイルエラー確認 → エラーがなければ次の操作へ進む
 
-導入後は UnityMCP のツールを積極的に活用する (Editor 状態確認、Console ログ取得、コンパイルエラー検出)。
+複数 Unity インスタンスが起動中の場合は `set_active_instance` でターゲットを固定する (本プロジェクトは `ShaderScope`)。
 
 ## コーディング規約
 
